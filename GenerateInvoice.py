@@ -133,24 +133,35 @@ if customer != "Select customer":
                 c.drawString(450, y, f"R{item['quantity'] * item['price']:,.2f}")
                 y -= 20
             # Summary
-            c.line(50, y - 5, width - 50, y - 5)
-            y -= 25
-            c.drawRightString(400, y, "Subtotal:")
-            c.drawRightString(width - 50, y, f"R{subtotal:,.2f}")
-            y -= 15
-            c.drawRightString(400, y, "VAT (15%):")
-            c.drawRightString(width - 50, y, f"R{vat:,.2f}")
-            y -= 15
-            c.setFont("Helvetica-Bold", 10)
-            c.drawRightString(400, y, "Total:")
-            c.drawRightString(width - 50, y, f"R{total:,.2f}")
-            # Footer
-            c.setFont("Helvetica-Oblique", 10)
-            c.drawCentredString(width / 2, 40, "Thank you for your business. We look forward to working with you again!")
-            c.showPage()
-            c.save()
-            buffer.seek(0)
-            return buffer
+           # Summary – same alignment & positions as before, but using a list
+            summary_details = [
+                ("Subtotal:", f"R{subtotal:,.2f}"),
+                ("VAT (15%):", f"R{vat:,.2f}"),
+                ("Total:", f"R{total:,.2f}")
+            ]
+
+            c.line(50, y - 5, width - 50, y - 5)      # horizontal line
+            y -= 25                                   # first line starts 25 pt below the line
+
+            for i, (label, value) in enumerate(summary_details):
+                curr_y = y - i * 15                   # 15 pt spacing (same as bank details)
+                if i == 2:                            # make Total bold
+                    c.setFont("Helvetica-Bold", 10)
+                else:
+                    c.setFont("Helvetica", 10)
+
+                # LEFT‑ALIGNED label at x=400 (same as before)
+                c.drawString(400, curr_y, label)
+
+                # RIGHT‑ALIGNED value at x=width‑50 (same as before)
+                c.drawRightString(width - 50, curr_y, value)
+                # Footer
+                c.setFont("Helvetica-Oblique", 10)
+                c.drawCentredString(width / 2, 40, "Thank you for your business. We look forward to working with you again!")
+                c.showPage()
+                c.save()
+                buffer.seek(0)
+                return buffer
 
         # Generate PDF in memory
         pdf_buffer = generate_invoice_pdf(
