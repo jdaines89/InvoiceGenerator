@@ -160,6 +160,8 @@ if customer != "Select customer":
             key=f"dl_{invoice_number}"
         )
 
+        st.success(f"Invoice (i)-{invoice_number} saved successfully!")
+
         # ---- reset form for next invoice ----
         st.session_state.invoice_items = [{"description": "Item 1", "quantity": 1, "price": 100.0}]
     # -------------------------------------------------
