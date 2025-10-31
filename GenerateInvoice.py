@@ -9,7 +9,7 @@ import json
 
 # --- CONFIG ---
 st.set_page_config(page_title="Crystal Trading", layout="centered")
-st.title("Crystal Trading")
+st.title("💎 Crystal Trading")
 
 # --- LOAD CONFIG FILE ---
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
@@ -65,9 +65,9 @@ for idx, item in enumerate(list(st.session_state.invoice_items)):
     item["description"] = col1.text_input("Description", value=item["description"], key=f"desc_{idx}")
     item["quantity"] = col2.number_input("Quantity", min_value=1, step=1, value=item["quantity"], key=f"qty_{idx}")
     item["price"] = col3.number_input("Price (ZAR)", min_value=0.0, step=100.0, value=item["price"], key=f"price_{idx}")
-    col4.button("Trash", key=f"remove_{idx}", on_click=remove_item, kwargs={"idx": idx})
+    col4.button("❌", key=f"remove_{idx}", on_click=remove_item, kwargs={"idx": idx})
 
-st.button("Plus Add Item", on_click=add_item)
+st.button("➕ Add Item", on_click=add_item)
 
 # --- CALCULATE TOTALS ---
 if customer != "Select customer":
@@ -75,9 +75,9 @@ if customer != "Select customer":
     vat = subtotal * 0.15 if vat_type == "VAT Exclusive" else (subtotal - (subtotal / 1.15))
     total = subtotal + vat if vat_type == "VAT Exclusive" else subtotal
 
-    st.markdown(f"### Money Bag Subtotal: R{subtotal:,.2f}")
-    st.markdown(f"### Receipt VAT (15%): R{vat:,.2f}")
-    st.markdown(f"### Checkmark Total: R{total:,.2f}")
+    st.markdown(f"### 💰 Subtotal: R{subtotal:,.2f}")
+    st.markdown(f"### 🧾 VAT (15%): R{vat:,.2f}")
+    st.markdown(f"### ✅ Total: R{total:,.2f}")
 
     # --- ONE-CLICK DOWNLOAD BUTTON ---
     if st.button("Receipt Generate Invoice"):
