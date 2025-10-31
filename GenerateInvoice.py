@@ -80,7 +80,7 @@ if customer != "Select customer":
     st.markdown(f"### ✅ Total: R{total:,.2f}")
 
     # --- ONE-CLICK DOWNLOAD BUTTON ---
-    if st.button("Receipt Generate Invoice"):
+    if st.button("Generate Invoice"):
         tracker["global_invoice_number"] += 1
         invoice_number = tracker["global_invoice_number"]
 
@@ -158,10 +158,10 @@ if customer != "Select customer":
                 # Footer
                 c.setFont("Helvetica-Oblique", 10)
                 c.drawCentredString(width / 2, 40, "Thank you for your business. We look forward to working with you again!")
-                c.showPage()
-                c.save()
-                buffer.seek(0)
-                return buffer
+            c.showPage()
+            c.save()
+            buffer.seek(0)
+            return buffer
 
         # Generate PDF in memory
         pdf_buffer = generate_invoice_pdf(
@@ -175,7 +175,7 @@ if customer != "Select customer":
 
         # ONE-CLICK DOWNLOAD
         st.download_button(
-            label="Receipt Download Invoice PDF",
+            label="Download Invoice",
             data=pdf_buffer.getvalue(),
             file_name=f"Crystal_Trading_(i)-{invoice_number}.pdf",
             mime="application/pdf",
