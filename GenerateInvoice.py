@@ -8,7 +8,7 @@ import os
 import json
 # --- CONFIG ---
 st.set_page_config(page_title="Crystal Trading", layout="centered")
-st.title("💎 Crystal Trading")
+st.title("Crystal Trading")
 # --- LOAD CONFIG FILE ---
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
 if not os.path.exists(CONFIG_FILE):
@@ -55,19 +55,24 @@ for idx, item in enumerate(list(st.session_state.invoice_items)):
     item["description"] = col1.text_input("Description", value=item["description"], key=f"desc_{idx}")
     item["quantity"] = col2.number_input("Quantity", min_value=1, step=1, value=item["quantity"], key=f"qty_{idx}")
     item["price"] = col3.number_input("Price (ZAR)", min_value=0.0, step=100.0, value=item["price"], key=f"price_{idx}")
-    col4.button("❌", key=f"remove_{idx}", on_click=remove_item, kwargs={"idx": idx})
-st.button("➕ Add Item", on_click=add_item)
+    col4.button("remove", key=f"remove_{idx}", on_click=remove_item, kwargs={"idx": idx})
+st.button("Add Item", on_click=add_item)
 # --- CALCULATE TOTALS ---
 if customer != "Select customer":
     subtotal = sum(item["quantity"] * item["price"] for item in st.session_state.invoice_items)
     vat = subtotal * 0.15 if vat_type == "VAT Exclusive" else (subtotal - (subtotal / 1.15))
     total = subtotal + vat if vat_type == "VAT Exclusive" else subtotal
-    st.markdown(f"### 💰 Subtotal: R{subtotal:,.2f}")
-    st.markdown(f"### 🧾 VAT (15%): R{vat:,.2f}")
-    st.markdown(f"### ✅ Total: R{total:,.2f}")
-    if st.button("🧾 Generate Invoice"):
+    st.markdown(f"### Subtotal: R{subtotal:,.2f}")
+    st.markdown(f"### VAT (15%): R{vat:,.2f}")
+    st.markdown(f"### Total: R{total:,.2f}")
+
+    # -------------------------------------------------
+    #  REPLACED BLOCK – download on button click
+    # -------------------------------------------------
+    if st.button("Generate Invoice"):
         tracker["global_invoice_number"] += 1
         invoice_number = tracker["global_invoice_number"]
+
         def generate_invoice_pdf(customer, items, subtotal, vat, total, vat_type, invoice_number):
             buffer = BytesIO()
             c = canvas.Canvas(buffer, pagesize=A4)
@@ -135,25 +140,28 @@ if customer != "Select customer":
             c.save()
             buffer.seek(0)
             return buffer
-        customer_dir = os.path.join(BASE_DIR, customer)
-        os.makedirs(customer_dir, exist_ok=True)
-        pdf_buffer = generate_invoice_pdf(customer, st.session_state.invoice_items, subtotal, vat, total, vat_type, invoice_number)
-        pdf_path = os.path.join(customer_dir, f"(i)-{invoice_number}.pdf")
-        with open(pdf_path, "wb") as f:
-            f.write(pdf_buffer.getbuffer())
+
+        # ---- create PDF in memory ----
+        pdf_buffer = generate_invoice_pdf(
+            customer, st.session_state.invoice_items,
+            subtotal, vat, total, vat_type, invoice_number
+        )
+
+        # ---- update tracker ----
         with open(TRACKER_FILE, "w") as f:
             json.dump(tracker, f)
-        with open(pdf_path, "rb") as f:
-            pdf_bytes = f.read()
-        st.success(f"Invoice (i)-{invoice_number} saved successfully!")
+
+        # ---- immediate download (no "saved" message) ----
         st.download_button(
             label="Download Invoice PDF",
-            data=pdf_bytes,
+            data=pdf_buffer.getvalue(),
             file_name=f"Crystal_Trading_(i)-{invoice_number}.pdf",
             mime="application/pdf",
             key=f"dl_{invoice_number}"
         )
-        # Reset
+
+        # ---- reset form for next invoice ----
         st.session_state.invoice_items = [{"description": "Item 1", "quantity": 1, "price": 100.0}]
+    # -------------------------------------------------
 else:
     st.info("Please select a customer to generate a invoice.")
