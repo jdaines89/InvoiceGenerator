@@ -97,7 +97,7 @@ if customer != "Select customer":
             c.drawString(50, height - 60, "Crystal Trading")
             c.setFont("Helvetica", 12)
             c.drawString(50, height - 100, f"Date: {date.today().strftime('%Y-%m-%d')}")
-            c.drawString(50, height - 80, "Invoice No: (i)-" + str(invoice_number))
+            c.drawString(50, height - 80, "Invoice No: " + str(invoice_number))
             c.drawString(50, height - 120, f"Customer: {customer}")
             # Banking details (top-right)
             c.setFont("Helvetica", 12)
@@ -177,7 +177,7 @@ if customer != "Select customer":
         st.download_button(
             label="Download Invoice",
             data=pdf_buffer.getvalue(),
-            file_name=f"Crystal_Trading_(i)-{invoice_number}.pdf",
+            file_name=f"Crystal_Trading-{invoice_number}.pdf",
             mime="application/pdf",
             key=f"dl_{invoice_number}",
             on_click=lambda: None  # forces immediate download
